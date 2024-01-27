@@ -35,7 +35,7 @@ const RegisterModal = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    axios.post('/ai/register', data)
+    axios.post('/api/register', data)
       .then(() => registerModal.onClose())
       .catch((error) => toast.error('Something went wrong.'))
       .finally(() => setIsLoading(false))
