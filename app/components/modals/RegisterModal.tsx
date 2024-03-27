@@ -1,5 +1,6 @@
 'use client';
 
+import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import axios from "axios";
 import { signIn } from "next-auth/react";
@@ -19,6 +20,7 @@ import Modal from "./Modal";
 
 const RegisterModal = () => {
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -41,6 +43,11 @@ const RegisterModal = () => {
       .catch((error) => toast.error('Something went wrong.'))
       .finally(() => setIsLoading(false))
   }
+
+  const toggleModal = useCallback(() => {
+    registerModal.onClose();
+    loginModal.onOpen();
+  }, [registerModal, loginModal]);
 
   const bodyContent = (
     <section className="
@@ -106,7 +113,7 @@ const RegisterModal = () => {
         <div className="justify-center flex flex-row items-center gap-2">
           <span>Already have an account?</span>
           <span
-            onClick={registerModal.onClose}
+            onClick={toggleModal}
             className="
               text-neutral-800
               font-bold

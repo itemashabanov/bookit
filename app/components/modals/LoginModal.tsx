@@ -52,10 +52,13 @@ const LoginModal = () => {
         if(callback?.error) {
           toast.error(callback.error);
         }
-
-
       })
   }
+
+  const toggleModal = useCallback(() => {
+    loginModal.onClose();
+    registerModal.onOpen();
+  }, [loginModal, registerModal]);
 
   const bodyContent = (
     <section className="
@@ -110,16 +113,16 @@ const LoginModal = () => {
         font-light
       ">
         <div className="justify-center flex flex-row items-center gap-2">
-          <span>Already have an account?</span>
+          <span>First time using BookIT?</span>
           <span
-            onClick={registerModal.onClose}
+            onClick={toggleModal}
             className="
               text-neutral-800
               font-bold
               cursor-pointer
               hover:underline
             "
-          >Log in</span>
+          >Create an account</span>
         </div>
       </div>
     </section>
