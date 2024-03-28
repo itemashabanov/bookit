@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Heading from "../Heading";
 import CategoryInput from "../inputs/CategoryInput";
+import Counter from "../inputs/Counter";
 import LocationSelect from "../inputs/LocationSelect";
 import { categories } from "../navbar/Categories";
 import Modal from "./Modal";
@@ -41,11 +42,13 @@ const AddBusinessModal = () => {
       price: 1,
       title: '',
       description: '',
+      workersCount: 1,
     }
   });
 
   const category = watch('category');
   const location = watch('location');
+  const workersCount = watch('workersCount');
 
   const Map = useMemo(() => dynamic(() => import('../Map'), {
     ssr: false,
@@ -135,6 +138,23 @@ const AddBusinessModal = () => {
         />
       </div>
     )
+  }
+
+  if (step === STEPS.INFO) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading 
+          title="Provide some info about your business"
+          subtitle="What service do you provide?"
+        />
+        <Counter
+          title="Number of workers"
+          subtitle="Number of workers"
+          value={workersCount}
+          onChange={(value) => setCustomValue('workersCount', value)}
+        />
+      </div>
+    );
   }
   
   return (
