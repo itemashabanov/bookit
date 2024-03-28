@@ -1,5 +1,6 @@
 "use client";
 
+import useAddBusinessModal from "@/app/hooks/useAddBusinessModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { SafeUser } from "@/app/types";
@@ -16,17 +17,26 @@ interface UserMenuProps {
 const UserMenu:React.FC<UserMenuProps> = ({currentUser}) => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
+  const addBusinessModal = useAddBusinessModal();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
   }, []);
 
+  const onAddBusiness = useCallback(() => {
+    if (!currentUser) {
+      return loginModal.onOpen();
+    }
+
+    addBusinessModal.onOpen();
+  }, [currentUser, loginModal, addBusinessModal]);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
         <div
-          onClick={() => {}}
+          onClick={onAddBusiness}
           className="
             hidden
             md:block
@@ -40,7 +50,7 @@ const UserMenu:React.FC<UserMenuProps> = ({currentUser}) => {
             cursor-pointer
           "
         >
-          Home
+          Add your Business
         </div>
         <div
           onClick={toggleOpen}
@@ -86,7 +96,8 @@ const UserMenu:React.FC<UserMenuProps> = ({currentUser}) => {
             {currentUser ? (
               <>
                 <MenuItem onClick={loginModal.onOpen} label="My Appointments" />
-                <MenuItem onClick={registerModal.onOpen} label="My Favorites" />
+                <MenuItem onClick={addBusinessModal.onOpen} label="My Favorites" />
+                <MenuItem onClick={addBusinessModal.onOpen} label="Add your Business" />
                 <hr />
                 <MenuItem onClick={() => signOut()} label="Log Out" />
               </>
