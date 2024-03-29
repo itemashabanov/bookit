@@ -7,6 +7,7 @@ import { FieldValues, useForm } from "react-hook-form";
 import Heading from "../Heading";
 import CategoryInput from "../inputs/CategoryInput";
 import Counter from "../inputs/Counter";
+import ImageUpload from "../inputs/ImageUpload";
 import LocationSelect from "../inputs/LocationSelect";
 import { categories } from "../navbar/Categories";
 import Modal from "./Modal";
@@ -49,6 +50,7 @@ const AddBusinessModal = () => {
   const category = watch('category');
   const location = watch('location');
   const workersCount = watch('workersCount');
+  const imageSrc = watch('imageSrc');
 
   const Map = useMemo(() => dynamic(() => import('../Map'), {
     ssr: false,
@@ -157,6 +159,21 @@ const AddBusinessModal = () => {
     );
   }
   
+  if (step === STEPS.IMAGES) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading 
+          title="Add a photo"
+          subtitle="Add some photos of your place"
+        />
+        <ImageUpload
+          value={imageSrc}
+          onChange={(value) => setCustomValue('imageSrc', value)}
+        />
+      </div>
+    );
+  }
+
   return (
     <Modal
       isOpen={addBusinessModal.isOpen}
