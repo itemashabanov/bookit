@@ -1,13 +1,17 @@
 'use client';
 
 import useAddBusinessModal from "@/app/hooks/useAddBusinessModal";
+import axios from "axios";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import Heading from "../Heading";
 import CategoryInput from "../inputs/CategoryInput";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
+import Input from "../inputs/Input";
 import LocationSelect from "../inputs/LocationSelect";
 import { categories } from "../navbar/Categories";
 import Modal from "./Modal";
@@ -23,8 +27,10 @@ enum STEPS {
 
 const AddBusinessModal = () => {
   const addBusinessModal = useAddBusinessModal();
+  const router = useRouter();
 
   const [step, setStep] = useState(STEPS.CATEGORY);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -70,6 +76,25 @@ const AddBusinessModal = () => {
 
   const onNext = () => {
     setStep((value) => value + 1);
+  }
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    if (step !== STEPS.PRICE) {
+      return onNext();
+    }
+
+    setIsLoading(true);
+
+    axios.post('/api/listings', data)
+      .then(() => {
+        toast.success('Your business is on moderation step!');
+        router.refresh();
+        reset();
+        setStep(STEPS.CATEGORY);
+        addBusinessModal.onClose();
+      })
+      .catch(() => toast.error('Something went wrong'))
+      .finally(() => setIsLoading(false));
   }
 
   const actionLabel = useMemo(() => {
@@ -174,11 +199,60 @@ const AddBusinessModal = () => {
     );
   }
 
+  if (step === STEPS.DESCRIPTION) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading 
+          title="Describe your place"
+          subtitle="What service do you provide?"
+        />
+        <Input
+          id="title"
+          label="Title"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+        <hr />
+        <Input
+          id="description"
+          label="Description"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+      </div>
+    );
+  }
+
+  if (step === STEPS.PRICE) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading 
+          title="Price"
+          subtitle="Set your price"
+        />
+        <Input
+          id="price"
+          label="Price"
+          formatPrice
+          type="number"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+      </div>
+    );
+  }
+
   return (
     <Modal
       isOpen={addBusinessModal.isOpen}
       onClose={addBusinessModal.onClose}
-      onSubmit={onNext}
+      onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
